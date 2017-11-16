@@ -22,22 +22,40 @@ const defaultState = [
 
 class Application extends Component {
   state = {
-    // Set the initial state,
+    items: defaultState,// Set the initial state,
   };
 
   // How are we going to manipualte the state?
   // Ideally, users are going to want to add, remove,
   // and check off items, right?
 
+  addItem = (item) => {
+    this.setState({items: [item, ...this.state.items]})
+  }
+  removeItem = (itemToRemove) => {
+    var updatedItems = this.state.items.filter(item=>item.id !== itemToRemove.id)
+    this.setState({items: updatedItems});
+  }
+  toggleItem = (itemToToggle) => {
+    const items = this.state.items.map(item => {
+      if (item.id !== itemToToggle.id) return item;
+      return {...itemToToggle, packed: !itemToToggle.packed}
+    })
+    this.setState({items})
+  }
+
   render() {
     // Get the items from state
+    const {items} = this.state;
+    var unpacked = items.filter(item => !item.packed);
+    var packed = items.filter(item => item.packed);
 
     return (
       <div className="Application">
-        <NewItem />
+        <NewItem onSubmit={this.addItem}/>
         <CountDown />
-        <Items title="Unpacked Items" items={[]} />
-        <Items title="Packed Items" items={[]} />
+        <Items onRemove={this.removeItem} title="Unpacked Items" items={unpacked} onToggle={this.toggleItem}/>
+        <Items onRemove={this.removeItem} title="Packed Items" items={packed} onToggle={this.toggleItem}/>
         <button className="button full-width">Mark All As Unpacked</button>
       </div>
     );
